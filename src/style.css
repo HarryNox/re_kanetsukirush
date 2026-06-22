@@ -96,6 +96,14 @@ h1 span {
   font-size: 2rem;
   color: var(--primary);
 }
+h1 span.version {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: normal;
+  vertical-align: super;
+  margin-left: 10px;
+  text-shadow: none;
+}
 
 h2 {
   font-size: 3rem;
