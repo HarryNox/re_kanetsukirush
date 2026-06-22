@@ -87,53 +87,58 @@ document.addEventListener('DOMContentLoaded', () => {
     gameInstance.retryGame(false); // Reset blocks
   });
 
-  // Setup Drag and Drop for UI to Canvas
+  // Setup Mobile-Friendly Drag and Drop for UI to Canvas
   const dragger = document.getElementById('block-dragger');
-  
-  dragger.addEventListener('dragstart', (e) => {
-    if (gameInstance.blocksLeft <= 0) {
-      e.preventDefault();
-      return;
-    }
-    e.dataTransfer.setData('text/plain', 'block');
-    e.dataTransfer.effectAllowed = 'copy';
+  const canvasContainer = document.getElementById('canvas-container');
+  let activeGhost = null;
+
+  dragger.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    if (gameInstance.blocksLeft <= 0 || gameInstance.isTurnActive) return;
+
+    activeGhost = document.createElement('div');
+    activeGhost.className = 'draggable-block';
+    activeGhost.style.position = 'fixed';
+    activeGhost.style.pointerEvents = 'none';
+    activeGhost.style.zIndex = '9999';
+    activeGhost.style.opacity = '0.7';
+    activeGhost.style.left = (e.clientX - 25) + 'px';
+    activeGhost.style.top = (e.clientY - 10) + 'px';
+    document.body.appendChild(activeGhost);
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
   });
 
-  const canvasContainer = document.getElementById('canvas-container');
-  canvasContainer.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    if (gameInstance.isTurnActive) {
-      e.dataTransfer.dropEffect = 'none';
-      return;
-    }
+  function onPointerMove(e) {
+    if (!activeGhost) return;
+    activeGhost.style.left = (e.clientX - 25) + 'px';
+    activeGhost.style.top = (e.clientY - 10) + 'px';
+  }
+
+  function onPointerUp(e) {
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', onPointerUp);
+    if (!activeGhost) return;
     
+    document.body.removeChild(activeGhost);
+    activeGhost = null;
+
     const rect = canvasContainer.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
-    if (gameInstance.ball) {
-      const dx = x - gameInstance.ball.position.x;
-      const dy = y - gameInstance.ball.position.y;
-      const dist = Math.hypot(dx, dy);
-      
-      if (dist < 60) {
-        e.dataTransfer.dropEffect = 'none';
-        return;
-      }
-    }
-    
-    e.dataTransfer.dropEffect = 'copy';
-  });
 
-  canvasContainer.addEventListener('drop', (e) => {
-    e.preventDefault();
-    if (gameInstance.blocksLeft > 0) {
-      const rect = canvasContainer.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+    if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+      if (gameInstance.isTurnActive || gameInstance.blocksLeft <= 0) return;
+
+      if (gameInstance.ball) {
+        const dx = x - gameInstance.ball.position.x;
+        const dy = y - gameInstance.ball.position.y;
+        if (Math.hypot(dx, dy) < 60) return; // Too close to ball
+      }
       gameInstance.placeBlock(x, y);
     }
-  });
+  }
 
   // Expose gameOver callback to Game instance
   gameInstance.onGameOver = (score) => {
