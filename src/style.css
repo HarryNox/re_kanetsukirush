@@ -345,3 +345,31 @@ canvas {
     font-size: 1rem;
   }
 }
+
+/* Portrait Warning */
+#portrait-warning {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #0f111a;
+  z-index: 100000;
+  color: white;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+}
+.warning-content svg {
+  animation: rotate-phone 2s infinite ease-in-out;
+  margin-bottom: 20px;
+}
+@keyframes rotate-phone {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(90deg); }
+  100% { transform: rotate(90deg); }
+}
+@media screen and (max-width: 768px) and (orientation: portrait) {
+  #portrait-warning {
+    display: flex;
+  }
+}
