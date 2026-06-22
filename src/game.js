@@ -37,6 +37,18 @@ export class Game {
         this.render.canvas.width = this.width;
         this.render.canvas.height = this.height;
       }
+      
+      if (this.walls) {
+        const thickness = 200;
+        Body.setPosition(this.walls.top, { x: this.width / 2, y: -thickness/2 });
+        Body.setPosition(this.walls.bottom, { x: this.width / 2, y: this.height + thickness/2 });
+        Body.setPosition(this.walls.left, { x: -thickness/2, y: this.height / 2 });
+        Body.setPosition(this.walls.right, { x: this.width + thickness/2, y: this.height / 2 });
+      }
+      
+      if (this.bell) {
+        this.createBell();
+      }
     });
     
     this.initPhysics();
@@ -66,16 +78,19 @@ export class Game {
     // Create walls (make them very thick and bouncy to prevent going out of bounds)
     const wallOptions = { isStatic: true, render: { fillStyle: '#1e293b' }, restitution: 1.0, friction: 0, frictionStatic: 0 };
     const thickness = 200;
-    World.add(this.engine.world, [
-      Bodies.rectangle(this.width / 2, -thickness/2, this.width * 2, thickness, wallOptions),
-      Bodies.rectangle(this.width / 2, this.height + thickness/2, this.width * 2, thickness, wallOptions),
-      Bodies.rectangle(-thickness/2, this.height / 2, thickness, this.height * 2, wallOptions),
-      Bodies.rectangle(this.width + thickness/2, this.height / 2, thickness, this.height * 2, wallOptions)
-    ]);
+    
+    this.walls = {
+      top: Bodies.rectangle(this.width / 2, -thickness/2, this.width * 2, thickness, wallOptions),
+      bottom: Bodies.rectangle(this.width / 2, this.height + thickness/2, this.width * 2, thickness, wallOptions),
+      left: Bodies.rectangle(-thickness/2, this.height / 2, thickness, this.height * 2, wallOptions),
+      right: Bodies.rectangle(this.width + thickness/2, this.height / 2, thickness, this.height * 2, wallOptions)
+    };
+    
+    World.add(this.engine.world, Object.values(this.walls));
 
-    // Custom Drag Logic (Monster Strike style)
+    // Custom Drag Logic (Mobile-friendly Pointer Events)
     const canvas = this.render.canvas;
-    canvas.addEventListener('mousedown', (e) => {
+    canvas.addEventListener('pointerdown', (e) => {
       if (this.isTurnActive) return;
       
       const rect = canvas.getBoundingClientRect();
@@ -98,7 +113,7 @@ export class Game {
       this.dragCurrent = { x, y };
     });
     
-    window.addEventListener('mousemove', (e) => {
+    window.addEventListener('pointermove', (e) => {
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -119,7 +134,7 @@ export class Game {
       }
     });
     
-    window.addEventListener('mouseup', (e) => {
+    window.addEventListener('pointerup', (e) => {
       if (this.draggingBlock) {
         // Restore collisions
         this.draggingBlock.body.collisionFilter.mask = 0xFFFFFFFF;
