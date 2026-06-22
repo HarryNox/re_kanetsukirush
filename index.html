@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>鐘つきラッシュ！〜NEXT SHOT〜</title>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app">
+      <!-- UI Container -->
+      <div id="ui-layer">
+        
+        <!-- Setting / Gear Button (always visible except on title, or always) -->
+        <button id="btn-settings" class="icon-btn hidden" title="メニュー">⚙️</button>
+
+        <!-- Pause Menu Screen -->
+        <div id="screen-pause" class="screen hidden" style="z-index: 30;">
+          <h2>一時停止</h2>
+          <div class="menu-buttons">
+            <button id="btn-resume" class="btn primary">ゲームに戻る</button>
+            <button id="btn-pause-retry" class="btn">リトライ</button>
+            <button id="btn-pause-title" class="btn">タイトルへ戻る</button>
+          </div>
+        </div>
+
+        <!-- Title Screen -->
+        <div id="screen-title" class="screen active">
+          <h1>鐘つきラッシュ！<br><span>〜NEXT SHOT〜</span></h1>
+          <div class="menu-buttons">
+            <button id="btn-play" class="btn primary">遊ぶ</button>
+            <button id="btn-how-to" class="btn">遊び方</button>
+            <button id="btn-credits" class="btn">クレジット</button>
+          </div>
+          <footer>made by Sakura@HarryNox</footer>
+        </div>
+
+        <!-- How to Play Screen -->
+        <div id="screen-how-to" class="screen hidden">
+          <h2>遊び方</h2>
+          <div class="content-box">
+            <ul>
+              <li>ブロックを5つまで置くことができます。</li>
+              <li>置いた後ボールを発射して、鐘にぶつけるほど得点が増えます。</li>
+              <li>ブロックも回数を定めて、一定回数触れると壊れます（加点はしません）。</li>
+              <li>止まった箇所から再度発射できます（初回含め計3回）。</li>
+              <li>ブロックにぶつかると少し跳ねます。</li>
+            </ul>
+          </div>
+          <button class="btn btn-back">戻る</button>
+        </div>
+
+        <!-- Credits Screen -->
+        <div id="screen-credits" class="screen hidden">
+          <h2>クレジット</h2>
+          <div class="content-box">
+            <p><strong>ゲームデザイン・制作</strong></p>
+            <p>Sakura@HarryNox</p>
+            <p><em>鐘つきラッシュ！〜NEXT SHOT〜</em></p>
+          </div>
+          <button class="btn btn-back">戻る</button>
+        </div>
+
+        <!-- Game Overlay (UI during gameplay) -->
+        <div id="screen-game" class="screen hidden">
+          <div class="game-hud">
+            <div class="score-display">SCORE: <span id="score-val">0</span></div>
+            <div class="shots-display">SHOTS: <span id="shots-val">3</span></div>
+          </div>
+          
+          <div id="block-inventory">
+            <p>ブロック (残り<span id="blocks-left">5</span>)</p>
+            <div id="block-dragger" class="draggable-block" draggable="true"></div>
+            <p class="hint">キャンバスにドラッグして配置</p>
+          </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="screen-game-over" class="screen hidden">
+          <h2>GAMEOVER</h2>
+          <div class="final-score">SCORE: <span id="final-score-val">0</span></div>
+          <div class="menu-buttons">
+            <button id="btn-retry-keep" class="btn primary">リトライ<br><small>(ブロックはそのまま)</small></button>
+            <button id="btn-retry-reset" class="btn">リトライ<br><small>(最初から)</small></button>
+            <button class="btn btn-back">タイトルへ戻る</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Physics Canvas Container -->
+      <div id="canvas-container"></div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
