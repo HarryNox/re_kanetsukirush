@@ -28,27 +28,36 @@ export class Game {
     this.width = container.clientWidth || window.innerWidth;
     this.height = container.clientHeight || window.innerHeight;
     
+    let resizeTimer;
     window.addEventListener('resize', () => {
-      this.width = container.clientWidth || window.innerWidth;
-      this.height = container.clientHeight || window.innerHeight;
-      if (this.render) {
-        this.render.options.width = this.width;
-        this.render.options.height = this.height;
-        this.render.canvas.width = this.width;
-        this.render.canvas.height = this.height;
-      }
-      
-      if (this.walls) {
-        const thickness = 200;
-        Body.setPosition(this.walls.top, { x: this.width / 2, y: -thickness/2 });
-        Body.setPosition(this.walls.bottom, { x: this.width / 2, y: this.height + thickness/2 });
-        Body.setPosition(this.walls.left, { x: -thickness/2, y: this.height / 2 });
-        Body.setPosition(this.walls.right, { x: this.width + thickness/2, y: this.height / 2 });
-      }
-      
-      if (this.bell) {
-        this.createBell();
-      }
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        this.width = container.clientWidth || window.innerWidth;
+        this.height = container.clientHeight || window.innerHeight;
+        
+        if (this.render) {
+          this.render.canvas.width = this.width * window.devicePixelRatio;
+          this.render.canvas.height = this.height * window.devicePixelRatio;
+          this.render.options.width = this.width;
+          this.render.options.height = this.height;
+          Matter.Render.lookAt(this.render, {
+            min: { x: 0, y: 0 },
+            max: { x: this.width, y: this.height }
+          });
+        }
+        
+        if (this.walls) {
+          const thickness = 200;
+          Body.setPosition(this.walls.top, { x: this.width / 2, y: -thickness/2 });
+          Body.setPosition(this.walls.bottom, { x: this.width / 2, y: this.height + thickness/2 });
+          Body.setPosition(this.walls.left, { x: -thickness/2, y: this.height / 2 });
+          Body.setPosition(this.walls.right, { x: this.width + thickness/2, y: this.height / 2 });
+        }
+        
+        if (this.bell) {
+          this.createBell();
+        }
+      }, 150); // Debounce resize to prevent jitter and excessive re-renders
     });
     
     this.initPhysics();
