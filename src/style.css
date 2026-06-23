@@ -346,6 +346,20 @@ canvas {
   }
 }
 
+/* Landscape optimization for small heights */
+@media screen and (max-height: 500px) {
+  h1 { font-size: 2rem; margin-bottom: 1rem; }
+  h1 span { font-size: 1.2rem; }
+  h2 { font-size: 2rem; margin-bottom: 1rem; }
+  .btn { padding: 0.5rem 1.5rem; font-size: 1rem; }
+  .menu-buttons { flex-direction: row; flex-wrap: wrap; justify-content: center; width: 100%; gap: 0.5rem; }
+  .content-box { padding: 1rem; margin-bottom: 1rem; max-height: 70vh; }
+  .final-score { font-size: 2rem; margin-bottom: 1rem; }
+  .icon-btn { width: 36px; height: 36px; font-size: 1rem; top: 0.5rem; right: 0.5rem; }
+  .game-hud { top: 0.5rem; left: 0.5rem; transform: scale(0.8); transform-origin: top left; }
+  #block-inventory { bottom: 0.5rem; padding: 0.5rem 1rem; transform: translateX(-50%) scale(0.8); transform-origin: bottom center; }
+}
+
 /* Portrait Warning */
 #portrait-warning {
   display: none;
