@@ -278,7 +278,10 @@ export class Game {
       startY = this.height - 150;
     }
     
-    this.ball = Bodies.circle(startX, startY, 20, {
+    let radius = 20;
+    if (this.mode === 'mobile') radius = 15;
+    
+    this.ball = Bodies.circle(startX, startY, radius, {
       restitution: 0.95, 
       frictionAir: 0.002, // Less air friction = faster
       friction: 0, // No surface friction to prevent sticking
@@ -333,9 +336,13 @@ export class Game {
     // Combine into a single body
     this.bell = Body.create({
       parts: [handle, top, rim],
-      isStatic: true
+      isStatic: true,
+      label: 'bell'
     });
-    
+
+    if (this.mode === 'mobile') {
+      Body.scale(this.bell, 0.75, 0.75);
+    }
     World.add(this.engine.world, this.bell);
   }
 
@@ -417,7 +424,10 @@ export class Game {
     const dist = Vector.magnitude(Vector.sub({x, y}, this.ball.position));
     if (dist < 60) return; // Prevent placing on ball
 
-    const blockBody = Bodies.rectangle(x, y, 60, 60, {
+    let size = 60;
+    if (this.mode === 'mobile') size = 45;
+
+    const blockBody = Bodies.rectangle(x, y, size, size, {
       isStatic: true,
       restitution: 1.0, // Reduced from 1.2 to prevent exponential speed gain
       friction: 0, // Prevent ball from sticking
