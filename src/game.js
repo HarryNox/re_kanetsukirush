@@ -4,7 +4,8 @@ import confetti from 'canvas-confetti';
 const { Engine, Render, Runner, World, Bodies, Body, Events, Vector, Composite } = Matter;
 
 export class Game {
-  constructor() {
+  constructor(mode = 'pc') {
+    this.mode = mode;
     this.engine = null;
     this.render = null;
     this.runner = null;
@@ -268,9 +269,15 @@ export class Game {
     if (this.ball) {
       World.remove(this.engine.world, this.ball);
     }
-    // Fixed start position
-    const startX = 150;
-    const startY = this.height / 2;
+    // Determine start position based on mode
+    let startX = 150;
+    let startY = this.height / 2;
+    if (this.mode === 'mobile') {
+      // Portrait mode: ball at bottom center
+      startX = this.width / 2;
+      startY = this.height - 150;
+    }
+    
     this.ball = Bodies.circle(startX, startY, 20, {
       restitution: 0.95, 
       frictionAir: 0.002, // Less air friction = faster
@@ -291,16 +298,37 @@ export class Game {
       World.remove(this.engine.world, this.bell);
     }
     
-    const bx = this.width - 150;
-    const by = this.height / 2;
+    let bx = this.width - 150;
+    let by = this.height / 2;
+    if (this.mode === 'mobile') {
+      // Portrait mode: bell at top center
+      bx = this.width / 2;
+      by = 150;
+    }
     
     const style = { fillStyle: '#eab308', strokeStyle: '#ca8a04', lineWidth: 3 };
     const options = { render: style, friction: 0, frictionStatic: 0, restitution: 0.9 };
     
     // Create bell shape parts (taller vertically, and overlapping to prevent physics bugs)
-    const handle = Bodies.circle(bx, by - 80, 15, options);
-    const top = Bodies.trapezoid(bx, by - 20, 80, 130, 0.4, options);
-    const rim = Bodies.rectangle(bx, by + 40, 110, 30, { ...options, chamfer: { radius: 10 } });
+    let handle, top, rim;
+    if (this.mode === 'mobile') {
+      // In portrait mode, the bell should face downwards (since ball comes from below)
+      // Original bell faces left (flat rim on the left). We need to rotate the parts 90 degrees clockwise or counter-clockwise.
+      // Wait, original bell: handle at bx, by-80. top at by-20 (height 130). rim at by+40 (width 110, height 30).
+      // Let's create it facing down: handle at top, rim at bottom.
+      handle = Bodies.circle(bx, by - 80, 15, options);
+      top = Bodies.trapezoid(bx, by - 20, 80, 130, 0.4, options);
+      rim = Bodies.rectangle(bx, by + 40, 110, 30, { ...options, chamfer: { radius: 10 } });
+      // Actually, original bell faces DOWN already!
+      // handle is at y - 80 (top). rim is at y + 40 (bottom).
+      // So the ball comes from the left and hits the side of the bell in PC mode.
+      // In Mobile mode, the ball comes from the bottom and hits the rim!
+      // This is perfect.
+    } else {
+      handle = Bodies.circle(bx, by - 80, 15, options);
+      top = Bodies.trapezoid(bx, by - 20, 80, 130, 0.4, options);
+      rim = Bodies.rectangle(bx, by + 40, 110, 30, { ...options, chamfer: { radius: 10 } });
+    }
     
     // Combine into a single body
     this.bell = Body.create({
@@ -347,8 +375,11 @@ export class Game {
       this.blocks = [];
       this.blocksLeft = 5;
     } else {
-      // Keep blocks, but auto-collect any that are too close to the ball's fixed start position
-      const ballPos = {x: 150, y: this.height / 2};
+      // Keep blocks, but auto-collect any that are too close to the ball's start position
+      let ballPos = {x: 150, y: this.height / 2};
+      if (this.mode === 'mobile') {
+        ballPos = {x: this.width / 2, y: this.height - 150};
+      }
       this.blocks = this.blocks.filter(b => {
         const dist = Vector.magnitude(Vector.sub(b.body.position, ballPos));
         if (dist < 60) {

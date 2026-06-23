@@ -390,7 +390,16 @@ canvas {
   100% { transform: rotate(90deg); }
 }
 @media screen and (max-width: 768px) and (orientation: portrait) {
-  #portrait-warning {
+  body:not(.mode-mobile) #portrait-warning {
     display: flex;
   }
+}
+
+/* Mobile Mode Specific Styling */
+body.mode-mobile #block-inventory {
+  bottom: 0.5rem;
+  transform: translateX(-50%) scale(0.85);
+}
+body.mode-mobile .game-hud {
+  top: 0.5rem; left: 0.5rem; transform: scale(0.8); transform-origin: top left;
 }

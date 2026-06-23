@@ -12,7 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const btnSettings = document.getElementById('btn-settings');
-  const gameInstance = new Game();
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode') || 'pc';
+  document.body.classList.add(`mode-${mode}`);
+
+  const gameInstance = new Game(mode);
   let currentScreen = 'title';
 
   function showScreen(screenId) {
